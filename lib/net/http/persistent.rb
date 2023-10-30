@@ -176,6 +176,8 @@ class Net::HTTP::Persistent
     DEFAULT_POOL_SIZE = 256
   end
 
+  DEFAULT_POOL_TIMEOUT = 0.5
+
   ##
   # Error class for errors raised by Net::HTTP::Persistent.  Various
   # SystemCallErrors are re-raised with a human-readable message under this
@@ -470,7 +472,7 @@ class Net::HTTP::Persistent
   # not support a limit on allowed file handles.  You can have no more than
   # this many threads with active HTTP transactions.
 
-  def initialize name: nil, proxy: nil, pool_size: DEFAULT_POOL_SIZE
+  def initialize name: nil, proxy: nil, pool_size: DEFAULT_POOL_SIZE, pool_timeout: DEFAULT_POOL_TIMEOUT
     @name = name
 
     @debug_output     = nil
@@ -492,7 +494,7 @@ class Net::HTTP::Persistent
     @socket_options << [Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1] if
       Socket.const_defined? :TCP_NODELAY
 
-    @pool = Net::HTTP::Persistent::Pool.new size: pool_size do |http_args|
+    @pool = Net::HTTP::Persistent::Pool.new size: pool_size, timeout: pool_timeout do |http_args|
       Net::HTTP::Persistent::Connection.new Net::HTTP, http_args, @ssl_generation
     end
 

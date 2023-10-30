@@ -25,6 +25,9 @@ class Net::HTTP::Persistent::Pool < ConnectionPool # :nodoc:
     else
       stack = Thread.current[@key][net_http_args] ||= []
 
+      # TODO: The error that gets raised when no connections are available is not consistent.
+      # Sometimes it's a `ConnectionPool::TimeoutError` and sometimes it's a `ConnectionPool::Error`.
+      # see https://github.com/drbrain/net-http-persistent/pull/131
       raise ConnectionPool::Error, 'no connections are checked out' if
         stack.empty?
 
@@ -45,7 +48,7 @@ class Net::HTTP::Persistent::Pool < ConnectionPool # :nodoc:
     stack  = stacks[net_http_args] ||= []
 
     if stack.empty? then
-      conn = @available.pop connection_args: net_http_args
+      conn = @available.pop @timeout, connection_args: net_http_args
     else
       conn = stack.last
     end
