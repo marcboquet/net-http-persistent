@@ -177,11 +177,6 @@ class Net::HTTP::Persistent
   end
 
   ##
-  # The version of Net::HTTP::Persistent you are using
-
-  VERSION = '4.0.2'
-
-  ##
   # Error class for errors raised by Net::HTTP::Persistent.  Various
   # SystemCallErrors are re-raised with a human-readable message under this
   # class.
